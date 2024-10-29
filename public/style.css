@@ -87,9 +87,10 @@ button {
     padding: 1em;
 }
 
+
+
 .left-panel,
 .right-panel {
-
     overflow-y: auto;
 }
 
@@ -105,9 +106,12 @@ ul#fileList {
     gap: 1em;
 }
 
-ul li.folder:hover {
+ul li:hover{
     cursor: pointer;
-    box-shadow: inset 0 0 6px var(--light-color);
+}
+
+ul li.folder:hover {
+    box-shadow: inset 0 0 12px #ffffff94;
 }
 
 ul li.folder {
@@ -121,10 +125,22 @@ ul li.folder {
     flex-flow: column;
     border-radius: .5ex;
     margin: .2ex;
+    padding: 1ex;
+    font-size: .7em;
+    text-transform: uppercase;
+    letter-spacing: .123ex;
+    font-weight: 600;
 }
 
 ul li.icon {
     text-align: center;
     background-color: var(--light-color);
     border-radius: 1ex;
+}
+
+.back {
+    font-size: 5em;
+    line-height: 90%;
+    text-align: center;
+    display: inline;
 }

@@ -88,12 +88,12 @@
 
                 // Actualizar el título de la carpeta actual
                 const folderTitle = document.getElementById('folderTitle');
-                folderTitle.textContent = path ? `Contenido de la carpeta "${path.split('/').pop()}"` : 'Contenido de la carpeta "icons"';
+                folderTitle.textContent = path ? `${path.split('/').pop()}` : 'icons';
 
                 // Agregar opción para regresar a la carpeta padre
                 if (folder) {
                     const backItem = document.createElement('li');
-                    backItem.textContent = '⬅️ Volver';
+                    backItem.textContent = '←';
                     backItem.classList.add('back'); // Clase para el elemento de retroceso
                     backItem.addEventListener('click', () => loadFileList(path.substring(0, path.lastIndexOf('/'))));
                     fileList.appendChild(backItem);
