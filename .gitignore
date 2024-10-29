@@ -1,0 +1,12 @@
+# Dependencias y configuraciones de Node
+node_modules/
+
+# Directorio de íconos y archivos de salida
+data/icons/
+
+# Archivos temporales de Puppeteer
+*.log
+
+# Scraped Icons
+/icons
+
