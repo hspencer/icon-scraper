@@ -1,129 +1,142 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Icon Scraper</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:wght@300;400;700;900&display=swap"
-        rel="stylesheet">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:wght@300;400;700;900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <div class="container">
-        <!-- Columna de búsqueda -->
-        <div class="left-panel">
-            <h1>Icon Scraper</h1>
-            <form id="scraperForm">
-                <label for="keyword">Palabra clave:</label>
-                <input type="text" id="keyword" placeholder="noun" required>
-                <button type="submit" id="searchButton">Buscar</button>
-            </form>
-            <div id="output"></div>
-        </div>
+      <!-- Columna de búsqueda -->
+      <div class="left-panel">
+        <h1>Icon Scraper</h1>
+        <form id="scraperForm">
+          <label for="keyword">Palabra clave:</label>
+          <input type="text" id="keyword" placeholder="noun" required />
+          <button type="submit" id="searchButton">Buscar</button>
+        </form>
+        <div id="output"></div>
+      </div>
 
-        <!-- Columna de navegación de archivos -->
-        <div class="right-panel">
-            <h2 id="folderTitle">Contenido de la carpeta</h2>
-            <ul id="fileList"></ul>
-        </div>
+      <!-- Columna de navegación de archivos -->
+      <div class="right-panel">
+        <h2 id="folderTitle">Contenido de la carpeta</h2>
+        <ul id="fileList"></ul>
+      </div>
     </div>
 
     <script>
-        const form = document.getElementById('scraperForm');
-        const keywordInput = document.getElementById('keyword');
-        const output = document.getElementById('output');
-        const searchButton = document.getElementById('searchButton');
-        const fileList = document.getElementById('fileList');
+      const form = document.getElementById("scraperForm");
+      const keywordInput = document.getElementById("keyword");
+      const output = document.getElementById("output");
+      const searchButton = document.getElementById("searchButton");
+      const fileList = document.getElementById("fileList");
 
-        // Maneja la búsqueda
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
+      // Maneja la búsqueda
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-            const keyword = keywordInput.value.trim();
-            if (!keyword) return;
+        const keyword = keywordInput.value.trim();
+        if (!keyword) return;
 
-            output.innerHTML = `<p>Iniciando búsqueda para "${keyword}"...</p>`;
-            searchButton.disabled = true;
+        output.innerHTML = `<p>Iniciando búsqueda para "${keyword}"...</p>`;
+        searchButton.disabled = true;
 
-            try {
-                const response = await fetch('/scrape', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ keyword })
-                });
+        try {
+          const response = await fetch("/scrape", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ keyword }),
+          });
 
-                const data = await response.json();
-                if (response.ok) {
-                    output.innerHTML = `<p>${data.message}</p><p>Archivos descargados en: /icons/${keyword}</p>`;
-                    data.progress.forEach(progressMessage => {
-                        output.innerHTML += `<p>${progressMessage}</p>`;
-                    });
-                    loadFileList(); // Actualizar la lista de archivos al finalizar
+          const data = await response.json();
+          if (response.ok) {
+            output.innerHTML = `<p>${data.message}</p><p>Archivos descargados en: /icons/${keyword}</p>`;
+            data.progress.forEach((progressMessage) => {
+              output.innerHTML += `<p>${progressMessage}</p>`;
+            });
+            loadFileList(); // Actualizar la lista de archivos al finalizar
 
-                    // Agregar enlace para nueva búsqueda
-                    output.innerHTML += `<p><a href="#" id="newSearchLink">Buscar nuevo ícono a partir de una palabra</a></p>`;
-                    document.getElementById('newSearchLink').addEventListener('click', (e) => {
-                        e.preventDefault();
-                        output.innerHTML = ''; // Limpiar el área de mensajes
-                        keywordInput.value = ''; // Limpiar el campo de entrada
-                        keywordInput.focus(); // Colocar el cursor en el campo de entrada
-                    });
-                } else {
-                    output.innerHTML = `<p>Error: ${data.message}</p>`;
-                }
-            } catch (error) {
-                output.innerHTML = `<p>Error de conexión: ${error.message}</p>`;
-            } finally {
-                searchButton.disabled = false;
-            }
-        });
-
-        // Función para cargar la lista de archivos en la carpeta "icons"
-        async function loadFileList(folder = '') {
-            try {
-                const response = await fetch(`/list-icons?folder=${folder}`);
-                const { path, contents } = await response.json();
-                fileList.innerHTML = ''; // Limpiar lista previa
-
-                // Actualizar el título de la carpeta actual
-                const folderTitle = document.getElementById('folderTitle');
-                folderTitle.textContent = path ? `${path.split('/').pop()}` : 'icons';
-
-                // Agregar opción para regresar a la carpeta padre
-                if (folder) {
-                    const backItem = document.createElement('li');
-                    backItem.textContent = '←';
-                    backItem.classList.add('back'); // Clase para el elemento de retroceso
-                    backItem.addEventListener('click', () => loadFileList(path.substring(0, path.lastIndexOf('/'))));
-                    fileList.appendChild(backItem);
-                }
-
-                contents.forEach(file => {
-                    const listItem = document.createElement('li');
-                    if (file.isDirectory) {
-                        listItem.textContent = file.name;
-                        listItem.classList.add('folder'); // Agrega la clase 'folder'
-                        listItem.addEventListener('click', () => loadFileList(`${path}/${file.name}`));
-                    } else {
-                        const sanitizedPath = path.replace(/^\/+/, '');
-                        const img = document.createElement('img');
-                        img.src = `/icons/${sanitizedPath}/${file.name}`;
-                        img.alt = file.name;
-                        img.style.width = '100px';
-                        img.style.height = 'auto';
-                        listItem.appendChild(img);
-                        listItem.classList.add('icon'); // Agrega la clase 'file'
-                    }
-                    fileList.appendChild(listItem);
-                });
-            } catch (error) {
-                console.error("Error al cargar la lista de archivos:", error.message);
-            }
+            // Agregar enlace para nueva búsqueda
+            output.innerHTML += `<p><a href="#" id="newSearchLink">Buscar nuevo ícono a partir de una palabra</a></p>`;
+            document
+              .getElementById("newSearchLink")
+              .addEventListener("click", (e) => {
+                e.preventDefault();
+                output.innerHTML = ""; // Limpiar el área de mensajes
+                keywordInput.value = ""; // Limpiar el campo de entrada
+                keywordInput.focus(); // Colocar el cursor en el campo de entrada
+              });
+          } else {
+            output.innerHTML = `<p>Error: ${data.message}</p>`;
+          }
+        } catch (error) {
+          output.innerHTML = `<p>Error de conexión: ${error.message}</p>`;
+        } finally {
+          searchButton.disabled = false;
         }
+      });
 
-        // Cargar la lista de archivos al cargar la página
-        loadFileList();
+      // Función para cargar la lista de archivos en la carpeta "icons"
+      async function loadFileList(folder = "") {
+        try {
+          const response = await fetch(`/list-icons?folder=${folder}`);
+          const { path, contents } = await response.json();
+          fileList.innerHTML = ""; // Limpiar lista previa
+
+          // Actualizar el título de la carpeta actual
+          const folderTitle = document.getElementById("folderTitle");
+          folderTitle.textContent = path ? `${path.split("/").pop()}` : "icons";
+
+          // Agregar opción para regresar a la carpeta padre
+          if (folder) {
+            const backItem = document.createElement("li");
+            backItem.textContent = "←";
+            backItem.classList.add("back"); // Clase para el elemento de retroceso
+            backItem.addEventListener("click", () =>
+              loadFileList(path.substring(0, path.lastIndexOf("/")))
+            );
+            fileList.appendChild(backItem);
+          }
+
+          contents.forEach((file) => {
+            // Skip .DS_Store files
+            if (file.name === ".DS_Store") {
+              return; // Skip this iteration
+            }
+
+            const listItem = document.createElement("li");
+            if (file.isDirectory) {
+              listItem.textContent = file.name;
+              listItem.classList.add("folder"); // Agrega la clase 'folder'
+              listItem.addEventListener("click", () =>
+                loadFileList(`${path}/${file.name}`)
+              );
+            } else {
+              const sanitizedPath = path.replace(/^\/+/, "");
+              const img = document.createElement("img");
+              img.src = `/icons/${sanitizedPath}/${file.name}`;
+              img.alt = file.name;
+              img.style.width = "100%";
+              img.style.height = "auto";
+              listItem.appendChild(img);
+              listItem.classList.add("icon"); // Agrega la clase 'file'
+            }
+            fileList.appendChild(listItem);
+          });
+        } catch (error) {
+          console.error("Error al cargar la lista de archivos:", error.message);
+        }
+      }
+
+      // Cargar la lista de archivos al cargar la página
+      loadFileList();
     </script>
-</body>
+  </body>
 </html>

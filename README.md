@@ -20,7 +20,7 @@ Icon Scraper es una herramienta en Node.js que descarga íconos de [The Noun Pro
 
 ## Extraer múltiples íconos a partir de una lista
 
-1. Debes confeccionar un archivo JSON que contenga el listado de palabras que quieres extraer:
+1. Debes confeccionar un archivo `json` que contenga el listado de palabras que quieres extraer:
    ```json
    {
     "keywords": ["car", "motorcycle", "scooter", "bicycle", "skate"]
@@ -30,3 +30,4 @@ Icon Scraper es una herramienta en Node.js que descarga íconos de [The Noun Pro
    ```bash
    node scrapeFromJson.js keywords.json
    ```
+   El script se saltará la palabra que ya tenga una carpeta con su nombre dentro de `/icons`. Puedes aplicar este script a cualquier archivo `json`.

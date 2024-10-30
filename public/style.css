@@ -136,6 +136,7 @@ ul li.icon {
     text-align: center;
     background-color: var(--light-color);
     border-radius: 1ex;
+    padding: 1em;
 }
 
 .back {
@@ -143,4 +144,12 @@ ul li.icon {
     line-height: 90%;
     text-align: center;
     display: inline;
+    font-family: monospace;
+}
+
+li.back,
+li.icon{
+  display: flex;
+  justify-content: center;
+  flex-flow: column;
 }
