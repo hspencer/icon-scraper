@@ -10,6 +10,11 @@
       href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:wght@300;400;700;900&display=swap"
       rel="stylesheet"
     />
+    <style>
+      #output:empty {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
@@ -19,7 +24,7 @@
         <form id="scraperForm">
           <label for="keyword">Palabra clave:</label>
           <input type="text" id="keyword" placeholder="noun" required />
-          <button type="submit" id="searchButton">Buscar</button>
+          <button type="submit" id="searchButton">Scrape</button>
         </form>
         <div id="output"></div>
       </div>
@@ -64,7 +69,7 @@
             loadFileList(); // Actualizar la lista de archivos al finalizar
 
             // Agregar enlace para nueva búsqueda
-            output.innerHTML += `<p><a href="#" id="newSearchLink">Buscar nuevo ícono a partir de una palabra</a></p>`;
+            output.innerHTML += `<p><a href="#" id="newSearchLink"><br>Buscar nuevo ícono a partir de una palabra</a></p>`;
             document
               .getElementById("newSearchLink")
               .addEventListener("click", (e) => {
@@ -97,7 +102,10 @@
           // Agregar opción para regresar a la carpeta padre
           if (folder) {
             const backItem = document.createElement("li");
-            backItem.textContent = "←";
+            const backImg = document.createElement("img");
+            backImg.src = "back.png";
+            backImg.alt = "Volver"; 
+            backItem.appendChild(backImg);
             backItem.classList.add("back"); // Clase para el elemento de retroceso
             backItem.addEventListener("click", () =>
               loadFileList(path.substring(0, path.lastIndexOf("/")))
@@ -119,12 +127,10 @@
                 loadFileList(`${path}/${file.name}`)
               );
             } else {
-              const sanitizedPath = path.replace(/^\/+/, "");
+              const sanitizedPath = path.replace(/^\/+/g, "");
               const img = document.createElement("img");
               img.src = `/icons/${sanitizedPath}/${file.name}`;
               img.alt = file.name;
-              img.style.width = "100%";
-              img.style.height = "auto";
               listItem.appendChild(img);
               listItem.classList.add("icon"); // Agrega la clase 'file'
             }
